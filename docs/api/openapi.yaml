@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: Portfolio Admin Dashboard API
+  description: API for Admin Dashboard analytics, system health, and quick actions.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/admin/dashboard
+paths:
+  /overview:
+    get:
+      summary: Get system overview counts
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  projects:
+                    type: integer
+                  services:
+                    type: integer
+                  products:
+                    type: integer
+                  activeUsers30d:
+                    type: integer
+                  storageBytes:
+                    type: integer
+                  files:
+                    type: integer
+  /metrics:
+    get:
+      summary: Get time-series metrics (pageviews)
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Array of daily metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    pageviews:
+                      type: integer
+                    visits:
+                      type: integer
+  /system-health:
+    get:
+      summary: Get real-time server health stats
+      responses:
+        '200':
+          description: System health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cpu_pct:
+                    type: number
+                  mem_pct:
+                    type: number
+                  disk_pct:
+                    type: number
+                  db_status:
+                    type: string
+                    enum: [ok, down]
+                  uptime:
+                    type: integer
+  /recent-activity:
+    get:
+      summary: Get recent audit logs
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of activity logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    actor_name:
+                      type: string
+                    action:
+                      type: string
+                    object_type:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+  /actions:
+    post:
+      summary: Perform quick admin action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [clear_cache, run_backup, toggle_maintenance]
+                confirm:
+                  type: boolean
+      responses:
+        '200':
+          description: Action performed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  jobId:
+                    type: string

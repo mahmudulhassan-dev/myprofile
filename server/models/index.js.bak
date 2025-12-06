@@ -1,0 +1,326 @@
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/db.js';
+
+const Profile = sequelize.define('Profile', {
+    name: DataTypes.STRING,
+    title: DataTypes.STRING,
+    title_bn: DataTypes.STRING,
+    tagline: DataTypes.STRING,
+    tagline_bn: DataTypes.STRING,
+    bio: DataTypes.TEXT,
+    email: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    image: DataTypes.STRING,
+    // Store social links as JSON since it's a fixed structure
+    social: {
+        type: DataTypes.JSON,
+        defaultValue: {}
+    },
+    // Store companies as JSON
+    companies: {
+        type: DataTypes.JSON,
+        defaultValue: []
+    }
+});
+
+const Project = sequelize.define('Project', {
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    description_bn: DataTypes.TEXT,
+    link: DataTypes.STRING,
+    image: DataTypes.STRING,
+    tags: {
+        type: DataTypes.JSON,
+        defaultValue: []
+    },
+    gallery: {
+        type: DataTypes.JSON, // Array of image URLs
+        defaultValue: []
+    }
+});
+
+const Skill = sequelize.define('Skill', {
+    key: DataTypes.STRING,
+    title: DataTypes.STRING,
+    level: DataTypes.INTEGER,
+    color: DataTypes.STRING,
+    icon: DataTypes.STRING,
+    category: DataTypes.STRING // Frontend, Backend, Tools
+});
+
+const Service = sequelize.define('Service', {
+    title: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    icon: DataTypes.STRING
+});
+
+const Testimonial = sequelize.define('Testimonial', {
+    name: DataTypes.STRING,
+    role: DataTypes.STRING,
+    company: DataTypes.STRING,
+    message: DataTypes.TEXT,
+    image: DataTypes.STRING,
+    rating: DataTypes.INTEGER // 1-5
+});
+
+const Page = sequelize.define('Page', {
+    title: DataTypes.STRING,
+    slug: {
+        type: DataTypes.STRING,
+        unique: true
+    },
+    content: DataTypes.TEXT('long'),
+    meta_description: DataTypes.TEXT
+});
+
+const Setting = sequelize.define('Setting', {
+    key: {
+        type: DataTypes.STRING,
+        unique: true
+    },
+    value: DataTypes.TEXT, // Can store JSON or string
+    group: DataTypes.STRING // 'general', 'appearance', 'footer'
+});
+
+const User = sequelize.define('User', {
+    username: DataTypes.STRING,
+    email: { type: DataTypes.STRING, unique: true },
+    password: DataTypes.STRING, // In real app, hash this!
+    role: { type: DataTypes.STRING, defaultValue: 'Admin' }, // Admin, Client, Guest
+    avatar: DataTypes.STRING,
+    status: { type: DataTypes.STRING, defaultValue: 'Active' } // Active, Banned
+});
+
+const Subscriber = sequelize.define('Subscriber', {
+    email: { type: DataTypes.STRING, unique: true },
+    status: { type: DataTypes.STRING, defaultValue: 'Subscribed' }
+});
+
+const PricingPlan = sequelize.define('PricingPlan', {
+    name: DataTypes.STRING,
+    price: DataTypes.STRING,
+    period: DataTypes.STRING, // Monthly, Yearly
+    features: { type: DataTypes.JSON, defaultValue: [] }, // Array of strings
+    is_featured: { type: DataTypes.BOOLEAN, defaultValue: false },
+    button_text: DataTypes.STRING,
+    button_link: DataTypes.STRING
+});
+
+const FAQ = sequelize.define('FAQ', {
+    question: DataTypes.TEXT,
+    answer: DataTypes.TEXT,
+    category: DataTypes.STRING
+});
+
+const File = sequelize.define('File', {
+    path: { type: DataTypes.STRING, unique: true }, // Relative path from uploads root
+    name: DataTypes.STRING,
+    type: DataTypes.STRING, // folder, image, video, etc
+    size: DataTypes.INTEGER,
+    mime: DataTypes.STRING,
+    starred: { type: DataTypes.BOOLEAN, defaultValue: false },
+    object_type: DataTypes.STRING,
+    object_id: DataTypes.STRING,
+    details: { type: DataTypes.JSON, defaultValue: {} },
+    ip_address: DataTypes.STRING
+});
+
+const SystemMetric = sequelize.define('SystemMetric', {
+    cpu_pct: DataTypes.FLOAT,
+    mem_pct: DataTypes.FLOAT,
+    disk_pct: DataTypes.FLOAT,
+    queue_length: DataTypes.INTEGER,
+    db_status: DataTypes.STRING
+});
+
+const DashboardAggregate = sequelize.define('DashboardAggregate', {
+    title: DataTypes.STRING,
+    title_bn: DataTypes.STRING,
+    tagline: DataTypes.STRING,
+    tagline_bn: DataTypes.STRING,
+    bio: DataTypes.TEXT,
+    email: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    image: DataTypes.STRING,
+    // Store social links as JSON since it's a fixed structure
+    social: {
+        type: DataTypes.JSON,
+        defaultValue: {}
+    },
+    // Store companies as JSON
+    companies: {
+        type: DataTypes.JSON,
+        defaultValue: []
+    }
+});
+
+const Project = sequelize.define('Project', {
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    description_bn: DataTypes.TEXT,
+    link: DataTypes.STRING,
+    image: DataTypes.STRING,
+    tags: {
+        type: DataTypes.JSON,
+        defaultValue: []
+    },
+    gallery: {
+        type: DataTypes.JSON, // Array of image URLs
+        defaultValue: []
+    }
+});
+
+const Skill = sequelize.define('Skill', {
+    key: DataTypes.STRING,
+    title: DataTypes.STRING,
+    level: DataTypes.INTEGER,
+    color: DataTypes.STRING,
+    icon: DataTypes.STRING,
+    category: DataTypes.STRING // Frontend, Backend, Tools
+});
+
+const Service = sequelize.define('Service', {
+    title: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    icon: DataTypes.STRING
+});
+
+const Testimonial = sequelize.define('Testimonial', {
+    name: DataTypes.STRING,
+    role: DataTypes.STRING,
+    company: DataTypes.STRING,
+    message: DataTypes.TEXT,
+    image: DataTypes.STRING,
+    rating: DataTypes.INTEGER // 1-5
+});
+
+const Article = sequelize.define('Article', {
+    title: DataTypes.STRING,
+    slug: { type: DataTypes.STRING, unique: true },
+    excerpt: DataTypes.TEXT,
+    content: DataTypes.TEXT('long'),
+    image: DataTypes.STRING,
+    tags: { type: DataTypes.JSON, defaultValue: [] },
+    status: { type: DataTypes.STRING, defaultValue: 'Published' }, // Draft, Published
+    views: { type: DataTypes.INTEGER, defaultValue: 0 }
+});
+
+const Product = sequelize.define('Product', {
+    name: DataTypes.STRING,
+    price: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    link: DataTypes.STRING,
+    image: DataTypes.STRING,
+    category: DataTypes.STRING,
+    sku: DataTypes.STRING,
+    stock_status: DataTypes.STRING, // in_stock, out_of_stock
+    gallery: {
+        type: DataTypes.JSON, // Array of image URLs
+        defaultValue: []
+    }
+});
+
+const Order = sequelize.define('Order', {
+    productId: DataTypes.INTEGER,
+    productName: DataTypes.STRING,
+    amount: DataTypes.STRING,
+    customerName: DataTypes.STRING,
+    customerPhone: DataTypes.STRING,
+    customerEmail: DataTypes.STRING,
+    address: DataTypes.TEXT, // Added address
+    paymentMethod: DataTypes.STRING, // bkash, nagad, rocket, sslcommerz
+    transactionID: { type: DataTypes.STRING, unique: true },
+    val_id: DataTypes.STRING,
+    status: {
+        type: DataTypes.STRING, // Pending, Approved, Rejected, Shipped...
+        defaultValue: 'Pending'
+    },
+    payment_status: {
+        type: DataTypes.STRING, // Unpaid, Paid, Failed, Cancelled
+        defaultValue: 'Unpaid'
+    }
+});
+
+const Page = sequelize.define('Page', {
+    title: DataTypes.STRING,
+    slug: {
+        type: DataTypes.STRING,
+        unique: true
+    },
+    content: DataTypes.TEXT('long'),
+    meta_description: DataTypes.TEXT
+});
+
+const Setting = sequelize.define('Setting', {
+    key: {
+        type: DataTypes.STRING,
+        unique: true
+    },
+    value: DataTypes.TEXT, // Can store JSON or string
+    group: DataTypes.STRING // 'general', 'appearance', 'footer'
+});
+
+const User = sequelize.define('User', {
+    username: DataTypes.STRING,
+    email: { type: DataTypes.STRING, unique: true },
+    password: DataTypes.STRING, // In real app, hash this!
+    role: { type: DataTypes.STRING, defaultValue: 'Admin' }, // Admin, Client, Guest
+    avatar: DataTypes.STRING,
+    status: { type: DataTypes.STRING, defaultValue: 'Active' } // Active, Banned
+});
+
+const Subscriber = sequelize.define('Subscriber', {
+    email: { type: DataTypes.STRING, unique: true },
+    status: { type: DataTypes.STRING, defaultValue: 'Subscribed' }
+});
+
+const PricingPlan = sequelize.define('PricingPlan', {
+    name: DataTypes.STRING,
+    price: DataTypes.STRING,
+    period: DataTypes.STRING, // Monthly, Yearly
+    features: { type: DataTypes.JSON, defaultValue: [] }, // Array of strings
+    is_featured: { type: DataTypes.BOOLEAN, defaultValue: false },
+    button_text: DataTypes.STRING,
+    button_link: DataTypes.STRING
+});
+
+const FAQ = sequelize.define('FAQ', {
+    question: DataTypes.TEXT,
+    answer: DataTypes.TEXT,
+    category: DataTypes.STRING
+});
+
+const File = sequelize.define('File', {
+    path: { type: DataTypes.STRING, unique: true }, // Relative path from uploads root
+    name: DataTypes.STRING,
+    type: DataTypes.STRING, // folder, image, video, etc
+    size: DataTypes.INTEGER,
+    mime: DataTypes.STRING,
+    starred: { type: DataTypes.BOOLEAN, defaultValue: false },
+    object_type: DataTypes.STRING,
+    object_id: DataTypes.STRING,
+    details: { type: DataTypes.JSON, defaultValue: {} },
+    ip_address: DataTypes.STRING
+});
+
+const SystemMetric = sequelize.define('SystemMetric', {
+    cpu_pct: DataTypes.FLOAT,
+    mem_pct: DataTypes.FLOAT,
+    disk_pct: DataTypes.FLOAT,
+    queue_length: DataTypes.INTEGER,
+    db_status: DataTypes.STRING
+});
+
+const DashboardAggregate = sequelize.define('DashboardAggregate', {
+    date: { type: DataTypes.DATEONLY, unique: true },
+    pageviews: { type: DataTypes.INTEGER, defaultValue: 0 },
+    projects_count: DataTypes.INTEGER,
+    users_count: DataTypes.INTEGER
+});
+
+export {
+    sequelize,
+    Profile, Project, Skill, Service, Product, Page, Setting, Order, Article, Testimonial, User, Subscriber, PricingPlan, FAQ,
+    ActivityLog, SystemMetric, DashboardAggregate,
+    BlogPost, Category, Tag, Comment
+};

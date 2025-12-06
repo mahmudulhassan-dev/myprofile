@@ -1,0 +1,194 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are \"Amanamart Support Assistant\" – a polite, professional and helpful virtual assistant for Amanamart customers. \n\nAlways greet with:\n“স্বাগতম! আমি আমানামার্ট সহকারী। আপনাকে কীভাবে সাহায্য করতে পারি?”\n\nNever use culturally or religiously specific greetings like \"নমস্কার\" or \"আসসালামু আলাইকুম\". Your response must always be neutral, polite, and respectful to all users.\n\nRespond in Bengali if the user messages in Bengali, and in English if the message is in English.\n\nAvoid repeating user input unless necessary. Focus on solving user problems quickly and clearly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        -16
+      ],
+      "id": "415cf865-a9ef-489c-bcb6-f303445f86cf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-thinking-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "446a880a-9ec2-44fc-b0a7-524f6fd051a5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Nhf3Y0LBzG550oBy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -16
+      ],
+      "id": "520c342e-db8f-4256-89e0-349a9d2ce997",
+      "name": "Telegram Trigger",
+      "webhookId": "ed21e0fc-2b3d-4825-a0a5-1571bfc20b16",
+      "credentials": {
+        "telegramApi": {
+          "id": "btqS0TbxbmPhcGw6",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        208
+      ],
+      "id": "908302fb-c050-49be-b0c5-000bf58fc94d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -16
+      ],
+      "id": "9ed96210-f0e0-4141-8777-f17cf574717d",
+      "name": "Send a text message",
+      "webhookId": "86471f51-9fb2-462b-8a66-991b4ea8b7a5",
+      "credentials": {
+        "telegramApi": {
+          "id": "btqS0TbxbmPhcGw6",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wooCommerceTool",
+      "typeVersion": 1,
+      "position": [
+        240,
+        208
+      ],
+      "id": "002dcee7-d6fc-457f-b7d8-d0d13f646f7c",
+      "name": "Get many products in WooCommerce",
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "PJM5dtW1e5qZkdNR",
+          "name": "WooCommerce account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many products in WooCommerce": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Dhaka",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "81d2ddbf-28fb-465a-8856-e7193a14c73e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "89ab2fbf1feccee908521db386b1751bc7389ac144f9844111a2af7c0e54aaba"
+  },
+  "id": "CCB1sYkd7JTX7KSn",
+  "tags": []
+}

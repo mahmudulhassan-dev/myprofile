@@ -1,0 +1,162 @@
+{
+    "profile": {
+        "name": "Mahmudul Hassan",
+        "title": "Entrepreneur & Full Stack Developer",
+        "title_bn": "উদ্যোক্তা এবং ফুল স্ট্যাক ডেভেলপার",
+        "tagline": "Building Digital Empires with Code & Automation",
+        "tagline_bn": "কোড এবং অটোমেশন দিয়ে ডিজিটাল সাম্রাজ্য গড়ছি",
+        "bio": "I am a visionary entrepreneur and tech expert with a passion for building scalable solutions. As the Founder & Co-Founder of Amanamart.com, AmanaFlow.com, and Alwarid, I bridge the gap between complex technology and business growth.",
+        "email": "hassan@amanaflow.com",
+        "phone": "01330005076",
+        "image": "/profile.jpg",
+        "social": {
+            "linkedin": "https://linkedin.com/in/mahmudulhassan",
+            "github": "https://github.com/mahmudulhassan",
+            "facebook": "https://facebook.com/mahmudulhassan",
+            "instagram": "https://instagram.com/mahmudulhassan",
+            "youtube": "https://youtube.com/mahmudulhassan"
+        },
+        "companies": [
+            {
+                "name": "Amanamart.com",
+                "role": "Founder",
+                "role_bn": "প্রতিষ্ঠাতা",
+                "description": "A premier e-commerce platform delivering excellence.",
+                "url": "https://amanamart.com"
+            },
+            {
+                "name": "AmanaFlow.com",
+                "role": "Founder",
+                "role_bn": "প্রতিষ্ঠাতা",
+                "description": "Service & Automation Platform streamlining business workflows.",
+                "url": "https://amanaflow.com"
+            },
+            {
+                "name": "Alwarid",
+                "role": "Co-Founder",
+                "role_bn": "সহ-প্রতিষ্ঠাতা",
+                "description": "A modern fashion and e-commerce lifestyle brand.",
+                "url": "#"
+            }
+        ]
+    },
+    "projects": [
+        {
+            "id": 1,
+            "name": "AutomateFlow Dashboard",
+            "description": "A smart automation dashboard using n8n for workflow management.",
+            "description_bn": "n8n ব্যবহার করে তৈরি একটি স্মার্ট অটোমেশন ড্যাশবোর্ড।",
+            "tags": [
+                "n8n",
+                "React",
+                "Node.js"
+            ],
+            "link": "#"
+        },
+        {
+            "id": 2,
+            "name": "CloudOptimizer",
+            "description": "Cloud infrastructure optimization tool with React frontend.",
+            "description_bn": "AWS খরচ কমানোর জন্য ক্লাউড ইনফ্রাস্ট্রাকচার অপ্টিমাইজেশন টুল।",
+            "tags": [
+                "AWS",
+                "React",
+                "Serverless"
+            ],
+            "link": "#"
+        }
+    ],
+    "products": [
+        {
+            "id": 1,
+            "name": "Premium Consultation",
+            "price": "$150",
+            "description": "One hour of intense business strategy consultation.",
+            "link": "https://calendly.com/mylink",
+            "image": "https://placehold.co/600x400/8B5CF6/ffffff?text=Consultation"
+        }
+    ],
+    "skills": [
+        {
+            "id": "html",
+            "title": "HTML5 & Accessibility",
+            "level": 95,
+            "color": "#E34F26"
+        },
+        {
+            "id": "css",
+            "title": "CSS3 & Tailwind",
+            "level": 90,
+            "color": "#38BDF8"
+        },
+        {
+            "id": "js",
+            "title": "JavaScript (ES6+)",
+            "level": 88,
+            "color": "#F7DF1E"
+        },
+        {
+            "id": "react",
+            "title": "React ecosystem",
+            "level": 85,
+            "color": "#61DAFB"
+        }
+    ],
+    "services": [
+        {
+            "id": 1,
+            "title": "Business Automation",
+            "description": "End-to-end workflow automation using n8n."
+        },
+        {
+            "id": 2,
+            "title": "Cloud Architecture",
+            "description": "Scalable and secure infrastructure design on AWS."
+        }
+    ],
+    "pages": [
+        {
+            "id": 1,
+            "title": "Privacy Policy",
+            "slug": "privacy-policy",
+            "content": "<h1>Privacy Policy</h1><p>Welcome to our privacy policy page. We respect your data...</p>"
+        },
+        {
+            "id": 2,
+            "title": "Terms of Use",
+            "slug": "terms",
+            "content": "<h1>Terms of Use</h1><p>By using this site, you agree to...</p>"
+        }
+    ],
+    "footer": {
+        "links": [
+            {
+                "label": "Home",
+                "url": "hero"
+            },
+            {
+                "label": "Services",
+                "url": "services"
+            },
+            {
+                "label": "Products",
+                "url": "products"
+            },
+            {
+                "label": "Contact",
+                "url": "contact"
+            }
+        ],
+        "legalLinks": [
+            {
+                "label": "Privacy Policy",
+                "url": "/p/privacy-policy"
+            },
+            {
+                "label": "Terms of Use",
+                "url": "/p/terms"
+            }
+        ],
+        "copyrightText": "All rights reserved. Designed for Performance."
+    }
+}
