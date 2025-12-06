@@ -1,135 +1,110 @@
-import { Project, Service, Product, User, ActivityLog, SystemMetric, DashboardAggregate, File } from '../models/index.js';
-import os from 'os';
-import sequelize from '../config/db.js';
+import {
+    Product, Service, BlogPost, Project, Contact, User, Subscriber, Order,
+    ActivityLog, SystemMetric, Currency
+} from '../models/index.js';
+import systeminformation from 'systeminformation';
+import { Op } from 'sequelize';
 
-// Helper to get formatted date
-const getDateStr = (d) => d.toISOString().split('T')[0];
-
-export const getOverview = async (req, res) => {
+// --- Aggregation ---
+export const getOverviewStats = async (req, res) => {
     try {
-        const [projects, services, products, users, filesCount] = await Promise.all([
-            Project.count(),
-            Service.count(),
+        const [
+            products, services, posts, projects,
+            contacts, users, subscribers, orders
+        ] = await Promise.all([
             Product.count(),
+            Service.count(),
+            BlogPost.count(),
+            Project.count(),
+            Contact.count(),
             User.count(),
-            File.count()
+            Subscriber.count(),
+            Order.count()
         ]);
 
-        // Mock storage estimation (sum of file sizes in DB)
-        const storageSize = await File.sum('size') || 0;
-
         res.json({
-            projects,
-            services,
-            products,
-            activeUsers30d: users, // For now total users
-            storageBytes: storageSize,
-            files: filesCount
+            products, services, posts, projects,
+            contacts, users, subscribers, orders
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-export const getMetrics = async (req, res) => {
+export const getFinancialStats = async (req, res) => {
     try {
-        // Return real aggregates + padding for missing dates
-        const days = parseInt(req.query.days) || 30;
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - days);
+        // Aggregate Orders
+        const orders = await Order.findAll({
+            where: { payment_status: 'Paid' },
+            attributes: ['amount', 'createdAt']
+        });
 
-        // Fetch aggregates
-        // For demo: generating synthetic data if empty
-        const data = [];
-        for (let i = 0; i < days; i++) {
-            const d = new Date(startDate);
-            d.setDate(d.getDate() + i);
-            data.push({
-                date: getDateStr(d),
-                pageviews: Math.floor(Math.random() * 500) + 100, // Synthetic for now
-                visits: Math.floor(Math.random() * 300) + 50
-            });
-        }
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+        const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.amount || 0), 0);
 
-export const getSystemHealth = async (req, res) => {
-    try {
-        const cpus = os.cpus();
-        const load = os.loadavg(); // [1, 5, 15] min avg
-        const totalMem = os.totalmem();
-        const freeMem = os.freemem();
+        // Mock Expense (Can be expanded to real Expense model later)
+        const totalExpense = totalRevenue * 0.2; // 20% mock expense
+        const netProfit = totalRevenue - totalExpense;
 
-        // Simple CPU usage calc
-        const cpuPct = (load[0] * 100) / cpus.length;
-        const memPct = ((totalMem - freeMem) / totalMem) * 100;
+        // Monthly Breakdown for Charts
+        const monthlyData = {};
+        orders.forEach(o => {
+            const date = new Date(o.createdAt);
+            const key = `${date.getFullYear()}-${date.getMonth() + 1}`;
+            if (!monthlyData[key]) monthlyData[key] = 0;
+            monthlyData[key] += parseFloat(o.amount || 0);
+        });
 
-        let dbStatus = 'ok';
-        try {
-            await sequelize.authenticate();
-        } catch (e) {
-            dbStatus = 'down';
-        }
+        const chartData = Object.keys(monthlyData).map(k => ({
+            name: k,
+            revenue: monthlyData[k],
+            expense: monthlyData[k] * 0.2,
+            profit: monthlyData[k] * 0.8
+        }));
 
         res.json({
-            cpu_pct: parseFloat(cpuPct.toFixed(1)),
-            mem_pct: parseFloat(memPct.toFixed(1)),
-            disk_pct: 45, // Placeholder (requires fs check)
-            db_status: dbStatus,
-            uptime: os.uptime()
+            totalRevenue,
+            totalExpense,
+            netProfit,
+            chartData
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-export const getRecentActivity = async (req, res) => {
+// --- System ---
+export const getSystemStats = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 50;
+        const [cpu, mem, disk] = await Promise.all([
+            systeminformation.currentLoad(),
+            systeminformation.mem(),
+            systeminformation.fsSize()
+        ]);
+
+        const stats = {
+            cpu: Math.round(cpu.currentLoad),
+            memory: Math.round((mem.active / mem.total) * 100),
+            disk: Math.round(disk[0] ? disk[0].use : 0),
+            uptime: systeminformation.time().uptime
+        };
+
+        // Log this metric for history (Optional, can be throttled)
+        // await SystemMetric.create({ ... });
+
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ error: "System Monitor Error" });
+    }
+};
+
+// --- Logs ---
+export const getActivityLogs = async (req, res) => {
+    try {
         const logs = await ActivityLog.findAll({
-            limit,
+            limit: 50,
             order: [['createdAt', 'DESC']]
         });
         res.json(logs);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-export const performAction = async (req, res) => {
-    const { action, confirm } = req.body;
-    if (!confirm) return res.status(400).json({ error: 'Confirmation required' });
-
-    try {
-        // Perform Action
-        let result = {};
-        if (action === 'clear_cache') {
-            // Mock cache clear
-            result = { message: 'System cache cleared successfully.' };
-        } else if (action === 'run_backup') {
-            // Mock backup
-            result = { message: 'Backup started in background.', jobId: Date.now() };
-        } else if (action === 'toggle_maintenance') {
-            // Toggle DB setting
-            result = { message: 'Maintenance mode toggled.' };
-        } else {
-            return res.status(400).json({ error: 'Invalid action' });
-        }
-
-        // Log it
-        await ActivityLog.create({
-            actor_name: 'Admin', // Should come from req.user
-            action: action,
-            object_type: 'System',
-            details: result,
-            ip_address: req.ip
-        });
-
-        res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

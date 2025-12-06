@@ -27,6 +27,14 @@ export const submitContact = async (req, res) => {
             return res.status(429).json({ error: 'Too many requests. Please try again later.' });
         }
 
+        // Extract Browser/OS (Simple parsing, could use a library like UAParser.js)
+        const ua = req.get('User-Agent') || '';
+        let browser = 'Unknown';
+        if (ua.includes('Chrome')) browser = 'Chrome';
+        else if (ua.includes('Firefox')) browser = 'Firefox';
+        else if (ua.includes('Safari')) browser = 'Safari';
+        else if (ua.includes('Edge')) browser = 'Edge';
+
         const contact = await Contact.create({
             full_name,
             email,
@@ -37,17 +45,42 @@ export const submitContact = async (req, res) => {
             budget_range,
             attachment,
             ip_address: req.ip,
-            user_agent: req.get('User-Agent'),
+            user_agent: ua,
+            browser,
             status: 'pending'
         });
 
         // Notify Admin
-        // In a real app, get admin email from settings or DB
-        // await sendEmail({
-        //     to: process.env.ADMIN_EMAIL || 'admin@example.com',
-        //     subject: `New Inquiry: ${subject}`,
-        //     html: `<p>From: ${full_name} (${email})</p><p>${message}</p>`
-        // });
+        try {
+            await sendEmail({
+                to: process.env.ADMIN_EMAIL || 'admin@example.com',
+                subject: `New Inquiry: ${subject}`,
+                html: `
+                    <h3>New Contact Message</h3>
+                    <p><strong>From:</strong> ${full_name} (${email})</p>
+                    <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
+                    <p><strong>Message:</strong><br/>${message}</p>
+                    <p><strong>Link:</strong> <a href="${process.env.CLIENT_URL}/admin/contacts">View in Admin Panel</a></p>
+                `
+            });
+
+            // Auto-reply to User
+            await sendEmail({
+                to: email,
+                subject: 'We received your message',
+                html: `
+                    <p>Hi ${full_name},</p>
+                    <p>Thank you for reaching out! We have received your message regarding "<strong>${subject}</strong>".</p>
+                    <p>We will get back to you shortly.</p>
+                    <br/>
+                    <p>Best regards,<br/>Antigravity Team</p>
+                `
+            });
+        } catch (emailErr) {
+            console.error("Email Error:", emailErr);
+            // Don't fail the request if email fails, just log it
+        }
 
         // Auto-reply (Optional)
         // await sendEmail({ to: email, subject: 'We received your message', html: '...' });

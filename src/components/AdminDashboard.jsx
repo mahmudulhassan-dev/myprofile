@@ -28,6 +28,8 @@ import ContactManager from './admin/contact/ContactManager';
 import ChatInbox from './admin/chat/ChatInbox';
 import PixelManager from './admin/pixel/PixelManager';
 import CurrencyManager from './admin/currency/CurrencyManager';
+import DashboardHome from './admin/dashboard/DashboardHome';
+import ContactManager from './admin/contact/ContactManager';
 
 // Placeholder for other sections to keep file clean
 const TabPlaceholder = ({ title }) => (

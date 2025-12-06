@@ -339,6 +339,9 @@ const Contact = sequelize.define('Contact', {
     status: { type: DataTypes.ENUM('pending', 'replied', 'archived', 'spam'), defaultValue: 'pending' },
     ip_address: DataTypes.STRING,
     user_agent: DataTypes.STRING,
+    browser: DataTypes.STRING,
+    browser_version: DataTypes.STRING,
+    os: DataTypes.STRING,
     country_code: DataTypes.STRING
 });
 
