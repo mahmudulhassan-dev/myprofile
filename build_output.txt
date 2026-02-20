@@ -1,12 +1,0 @@
-
-> myprofile@0.0.0 build
-> vite build
-
-[36mrolldown-vite v7.2.5 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming...✓ 2090 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/index.html                   0.45 kB │ gzip:   0.29 kB
-dist/assets/index-DI5YiD-T.css   13.35 kB │ gzip:   3.50 kB
-dist/assets/index-DIH6H699.js   349.74 kB │ gzip: 109.29 kB
-[32m✓ built in 646ms[39m
