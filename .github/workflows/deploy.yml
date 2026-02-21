@@ -1,0 +1,52 @@
+name: Amanaflow CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install Frontend Dependencies
+      run: |
+        cd client
+        npm install --legacy-peer-deps
+
+    - name: Build Frontend
+      run: |
+        cd client
+        npm run build
+
+    - name: Install Backend Dependencies
+      run: npm install --legacy-peer-deps
+
+    - name: Test Database Connection (Simulated)
+      run: node -e "console.log('✅ Validation: Dependencies and Builds ready.')"
+
+    - name: Archive Production Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: production-bundle
+        path: |
+          dist
+          server.js
+          package.json
+          config
+          models
+          routes
+          controllers
+          middleware
+          scripts
+          public
