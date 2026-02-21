@@ -102,8 +102,12 @@ const Project = sequelize.define('Project', {
     meta_description: DataTypes.TEXT,
     meta_keywords: DataTypes.STRING,
     category: DataTypes.STRING,
-    tags: { type: DataTypes.JSON, defaultValue: [] }
+    tags: { type: DataTypes.JSON, defaultValue: [] },
+    userId: { type: DataTypes.INTEGER, allowNull: true } // Associated Client User
 }, { paranoid: true });
+
+Project.belongsTo(User, { as: 'client', foreignKey: 'userId' });
+User.hasMany(Project, { foreignKey: 'userId' });
 
 const Skill = sequelize.define('Skill', {
     key: DataTypes.STRING,

@@ -4,6 +4,9 @@ import { Menu, X, Globe, User, ChevronDown } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useSettings } from '../context/SettingsContext';
 import CurrencyToggle from './common/CurrencyToggle';
+import ThemeToggle from './common/ThemeToggle';
+import LanguageSwitcher from './common/LanguageSwitcher';
+import NotificationCenter from './common/NotificationCenter';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,16 +17,6 @@ const Navbar = () => {
     // Header specific state
     const [headerSettings, setHeaderSettings] = useState({});
     const [menuItems, setMenuItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 50);
-        };
-        window.addEventListener('scroll', handleScroll);
-        fetchHeaderData();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const fetchHeaderData = async () => {
         try {
@@ -33,10 +26,17 @@ const Navbar = () => {
             setMenuItems(data.menu || []);
         } catch (error) {
             console.error('Failed to load header', error);
-        } finally {
-            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        fetchHeaderData();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Helper to render link items
     const renderLink = (item, isMobile = false) => {
@@ -84,8 +84,6 @@ const Navbar = () => {
     const headerBg = scrolled
         ? (headerSettings.header_bg_color || 'white')
         : (headerSettings.header_transparent === 'true' ? 'transparent' : (headerSettings.header_bg_color || 'white'));
-
-    const textColor = headerSettings.header_style === 'minimal' ? 'text-slate-900' : 'text-slate-600';
 
     return (
         <nav
@@ -143,30 +141,14 @@ const Navbar = () => {
                                 }
                                 return renderLink(item);
                             })}
+                            <a href="/client-portal" className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-all px-4 py-2 rounded-xl hover:bg-slate-50">Portal</a>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <CurrencyToggle />
-
-                            <div className="relative group">
-                                <button className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-white/50 text-slate-600 hover:text-primary-purple hover:border-purple-300 transition-all shadow-sm">
-                                    <span className="text-lg">{availableLanguages?.find(l => l.code === language)?.flag}</span>
-                                    <span className="text-xs font-bold uppercase">{language}</span>
-                                    <ChevronDown size={12} />
-                                </button>
-                                <div className="absolute top-full right-0 w-32 bg-white border border-slate-100 shadow-xl rounded-xl overflow-hidden hidden group-hover:block pt-2 animate-fade-in-up">
-                                    {availableLanguages?.map(lang => (
-                                        <button
-                                            key={lang.code}
-                                            onClick={() => changeLanguage(lang.code)}
-                                            className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-slate-50 transition ${language === lang.code ? 'text-primary-purple font-bold bg-purple-50/50' : 'text-slate-600'}`}
-                                        >
-                                            <span className="text-lg">{lang.flag}</span>
-                                            <span>{lang.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+                            <NotificationCenter />
+                            <LanguageSwitcher />
+                            <ThemeToggle />
 
                             {headerSettings.header_cta_enabled === 'true' && (
                                 <a

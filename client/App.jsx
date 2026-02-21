@@ -37,7 +37,8 @@ import PaymentFail from './components/payment/PaymentFail';
 import NewsletterPopup from './components/common/NewsletterPopup';
 import ChatWidget from './widget/ChatWidget';
 import PixelTracker from './components/common/PixelTracker';
-import SEO from './components/common/SEO';
+import AIAssistant from './components/common/AIAssistant';
+import ClientDashboard from './components/ClientDashboard';
 
 function App() {
   console.log("App component rendering");
@@ -136,6 +137,7 @@ function App() {
               <ScrollProgress />
               <Navbar />
               <NewsletterPopup />
+              <AIAssistant />
               <ChatWidget />
               <PixelTracker />
 

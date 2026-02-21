@@ -5,20 +5,39 @@
 @tailwind utilities;
 
 :root {
+  --bg-primary: #ffffff;
+  --text-primary: #0f172a;
+  --accent-purple: #6366f1;
+  --accent-blue: #0ea5e9;
   font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 }
 
-body {
-  @apply bg-slate-50 text-slate-900;
+.dark {
+  --bg-primary: #0f172a;
+  --text-primary: #f8fafc;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.aurora {
+  --bg-primary: #020617;
+  --text-primary: #f8fafc;
+  background-color: var(--bg-primary);
   background-image:
     radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
     radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
     radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+  color: var(--text-primary);
+}
+
+body {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  @apply antialiased transition-colors duration-500;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   background-attachment: fixed;
-  /* Override dark bg, set Aurora Base */
-  background: white;
   background-image: radial-gradient(at 40% 20%, hsla(250, 100%, 94%, 1) 0px, transparent 50%),
     radial-gradient(at 80% 0%, hsla(189, 100%, 91%, 1) 0px, transparent 50%),
     radial-gradient(at 0% 50%, hsla(341, 100%, 92%, 1) 0px, transparent 50%),

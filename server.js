@@ -34,6 +34,7 @@ const __dirname = path.dirname(__filename);
 import http from 'http';
 import { initSocket } from './services/socketService.js';
 import chatRoutes from './routes/chatRoutes.js';
+import { handleAIChat } from './controllers/aiController.js';
 import pixelRoutes from './routes/pixelRoutes.js';
 import currencyRoutes from './routes/currencyRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
@@ -101,6 +102,23 @@ app.use('/api/admin/users', userRoutes); // User Management
 app.use('/api/admin/roles', roleRoutes); // Role Management
 app.use('/api/comments', commentRoutes); // Comments System
 app.use('/api/newsletter', newsletterRoutes); // Newsletter System
+
+// AI Route
+app.post('/api/ai/chat', handleAIChat);
+
+app.get('/api/projects/my-projects', async (req, res) => {
+    try {
+        // In a real app, we'd get userId from req.user (jwt)
+        // For testing/mocking, we'll fetch all projects if no auth is present
+        const projects = await Project.findAll({
+            where: req.user ? { userId: req.user.id } : {}
+        });
+        res.json(projects);
+    } catch {
+        res.status(500).json({ error: 'Failed' });
+    }
+});
+
 app.use('/api/projects', projectRoutes); // Project System
 app.use('/api/contact', contactRoutes); // Contact System
 app.use('/api/chat', chatRoutes); // Live Chat System

@@ -4,23 +4,26 @@ import { Link } from 'react-scroll';
 import { ArrowRight, Download, Github, Linkedin, Facebook, Youtube } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useSettings } from '../context/SettingsContext';
+import ParticleBackground from './common/ParticleBackground';
 
 const Hero = () => {
     const { t } = useLanguage();
     const { profile, settings } = useSettings();
 
-    // Loading state handled by App fallback primarily, but safe check here
     if (!profile) return null;
 
     return (
-        <section id="hero" className="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden bg-aurora-bg">
-            {/* Dynamic Background Blobs */}
+        <section id="hero" className="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden bg-slate-50">
+            {/* V2.0 Particle Engine */}
+            <ParticleBackground color={settings.primary_color || '#6366f1'} />
+
+            {/* Ambient Glows */}
             <div
-                className="absolute top-20 right-0 w-[500px] h-[500px] rounded-full blur-[100px] opacity-60 animate-blob mix-blend-multiply"
+                className="absolute top-20 right-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-40 animate-blob"
                 style={{ backgroundColor: settings.primary_color || '#c084fc' }}
             ></div>
             <div
-                className="absolute bottom-20 left-0 w-[500px] h-[500px] rounded-full blur-[100px] opacity-60 animate-blob animation-delay-2000 mix-blend-multiply"
+                className="absolute bottom-20 left-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-40 animate-blob animation-delay-2000"
                 style={{ backgroundColor: settings.secondary_color || '#f472b6' }}
             ></div>
 
@@ -30,100 +33,103 @@ const Hero = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className="inline-block px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm border border-slate-200 text-slate-600 font-semibold mb-6 shadow-sm">
+                    <div className="inline-block px-4 py-2 rounded-full bg-white/40 backdrop-blur-md border border-white/50 text-slate-700 font-bold mb-6 shadow-sm">
                         🚀 {t('hero_greeting') || profile.tagline || settings.tagline}
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-bold text-slate-800 leading-tight mb-6">
-                        {t('hero_greeting')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-purple to-aurora-pink" style={{ backgroundImage: `linear-gradient(to right, ${settings.primary_color}, ${settings.secondary_color})` }}>
+                    <h1 className="text-6xl md:text-8xl font-black text-slate-900 leading-[1.1] mb-8 tracking-tighter">
+                        {t('hero_greeting')} <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 drop-shadow-sm" style={{ backgroundImage: `linear-gradient(to right, ${settings.primary_color}, ${settings.secondary_color})` }}>
                             {profile.name}
                         </span>
                     </h1>
 
-                    <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-lg">
+                    <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-lg font-medium">
                         {profile.bio || settings.site_description}
                     </p>
 
-                    <div className="flex flex-wrap gap-4 mb-10">
+                    <div className="flex flex-wrap gap-5 mb-12">
                         <Link
                             to="projects"
                             smooth={true}
                             duration={500}
-                            className="px-8 py-4 rounded-full bg-slate-900 text-white font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                            className="px-10 py-5 rounded-full bg-slate-900 text-white font-black flex items-center gap-3 hover:bg-slate-800 transition-all shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-1 cursor-pointer group"
                         >
-                            {t('hero_cta')} <ArrowRight size={20} />
+                            {t('hero_cta')} <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
 
                         <a
                             href="/resume.pdf"
                             target="_blank"
-                            className="px-8 py-4 rounded-full bg-white text-slate-800 font-bold border border-slate-200 flex items-center gap-2 hover:border-purple-300 hover:bg-purple-50 transition-all shadow-md hover:shadow-lg"
+                            className="px-10 py-5 rounded-full bg-white/60 backdrop-blur-md text-slate-800 font-black border border-white flex items-center gap-3 hover:bg-white/80 transition-all shadow-xl hover:shadow-indigo-500/10"
                         >
-                            {t('hero_contact')} <Download size={20} />
+                            {t('hero_contact')} <Download size={22} />
                         </a>
                     </div>
 
-                    <div className="flex items-center gap-6 text-slate-500">
+                    <div className="flex items-center gap-8 text-slate-400">
                         {settings.social_github && (
-                            <a href={settings.social_github} target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-transform hover:scale-110"><Github size={24} /></a>
+                            <a href={settings.social_github} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-all hover:scale-125"><Github size={28} /></a>
                         )}
                         {settings.social_linkedin && (
-                            <a href={settings.social_linkedin} target="_blank" rel="noreferrer" className="hover:text-blue-600 transition-transform hover:scale-110"><Linkedin size={24} /></a>
+                            <a href={settings.social_linkedin} target="_blank" rel="noreferrer" className="hover:text-blue-600 transition-all hover:scale-125"><Linkedin size={28} /></a>
                         )}
                         {settings.social_facebook && (
-                            <a href={settings.social_facebook} target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-transform hover:scale-110"><Facebook size={24} /></a>
+                            <a href={settings.social_facebook} target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-all hover:scale-125"><Facebook size={28} /></a>
                         )}
                         {settings.social_youtube && (
-                            <a href={settings.social_youtube} target="_blank" rel="noreferrer" className="hover:text-red-600 transition-transform hover:scale-110"><Youtube size={24} /></a>
+                            <a href={settings.social_youtube} target="_blank" rel="noreferrer" className="hover:text-red-600 transition-all hover:scale-125"><Youtube size={28} /></a>
                         )}
                     </div>
                 </motion.div>
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 1, ease: "easeOut" }}
                     className="relative hidden md:block"
                 >
-                    <div className="relative w-[450px] h-[450px] mx-auto">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-purple-200 to-pink-200 rounded-full animate-pulse blur-3xl opacity-50"></div>
-                        <img
-                            src={profile.image || "/profile.jpg"}
-                            alt={profile.name}
-                            className="w-full h-full object-cover rounded-[3rem] shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500 border-8 border-white/50"
-                        />
+                    <div className="relative group">
+                        {/* Interactive Frame */}
+                        <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-[4rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+
+                        <div className="relative w-[500px] h-[580px] mx-auto overflow-hidden rounded-[4rem] shadow-[-20px_20px_60px_rgba(0,0,0,0.1)] border-[12px] border-white/80 backdrop-blur-sm">
+                            <img
+                                src={profile.image || "/profile.jpg"}
+                                alt={profile.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                        </div>
+
+                        {/* Floating Tech Cards (Glass) */}
+                        <motion.div
+                            animate={{ y: [0, -10, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute -bottom-6 -left-12 bg-white/70 backdrop-blur-xl p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl">5+</div>
+                                <div>
+                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Years Agency</p>
+                                    <p className="font-black text-slate-900 leading-none">Experience</p>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            animate={{ y: [0, 10, 0] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute top-12 -right-10 bg-white/70 backdrop-blur-xl p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="bg-purple-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl">🚀</div>
+                                <div>
+                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Scale Fast</p>
+                                    <p className="font-black text-slate-900 leading-none">Automation</p>
+                                </div>
+                            </div>
+                        </motion.div>
                     </div>
-
-                    {/* Floating Stats */}
-                    <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="absolute bottom-10 -left-10 bg-white/80 backdrop-blur p-4 rounded-2xl shadow-xl border border-white"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="bg-green-100 p-2 rounded-lg text-green-600 font-bold">5+</div>
-                            <div>
-                                <p className="text-xs text-slate-500 font-bold uppercase">Years Exp.</p>
-                                <p className="font-bold text-slate-800">Developer</p>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.7 }}
-                        className="absolute top-10 -right-5 bg-white/80 backdrop-blur p-4 rounded-2xl shadow-xl border border-white"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="bg-blue-100 p-2 rounded-lg text-blue-600 font-bold">20+</div>
-                            <div>
-                                <p className="text-xs text-slate-500 font-bold uppercase">Projects</p>
-                                <p className="font-bold text-slate-800">Completed</p>
-                            </div>
-                        </div>
-                    </motion.div>
                 </motion.div>
             </div>
         </section>
@@ -131,3 +137,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
