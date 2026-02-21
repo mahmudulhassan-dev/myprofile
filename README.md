@@ -40,10 +40,13 @@ A robust, full-stack portfolio and business automation platform built with React
 - **Backend**: Node.js, Express, Sequelize ORM.
 - **Database**: MySQL.
 - **Real-time**: Socket.io.
+- **Business Intelligence**: Dashboard with real-time metrics and activity logs.
 
-## 🚀 Quick Setup
+## 🚀 Documentation
 
-For a detailed walkthrough, please refer to the **[Professional Installation Guide](INSTALL.md)**.
+- **[Installation Guide (Local)](INSTALL.md)**
+- **[Deployment Guide (Production)](DEPLOY.md)**
+- **[Contributing Guidelines](CONTRIBUTING.md)**
 
 1. **Install Dependencies**
 

@@ -164,7 +164,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm opacity-60">
                     <div className="text-center md:text-left">
-                        {footerSettings.footer_copyright || `© ${new Date().getFullYear()} ${globalSettings.site_title || 'Mahmudul Hassan'}. All rights reserved.`}
+                        {footerSettings.footer_copyright || `© ${new Date().getFullYear()} Amanaflow | Mahmudul Hassan. All rights reserved.`}
                     </div>
 
                     {/* Social Icons (Global) */}
