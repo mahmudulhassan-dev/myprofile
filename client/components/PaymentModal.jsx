@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { X, Copy, CheckCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSettings } from '../context/SettingsContext';

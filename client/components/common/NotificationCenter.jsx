@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bell, X, Info, CheckCircle, AlertTriangle } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useSocket } from '../../context/SocketContext';
 
 const NotificationCenter = () => {
