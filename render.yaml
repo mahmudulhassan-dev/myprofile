@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: myprofile-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # You will paste this from Supabase
+      - key: JWT_SECRET
+        sync: false # Your secret key
+      - key: JWT_REFRESH_SECRET
+        sync: false # Your refresh secret key
+      - key: CORS_ORIGIN
+        sync: false # Your Vercel frontend URL (e.g. https://myprofile.vercel.app)
+      - key: SUPABASE_URL
+        sync: false # From Supabase Project Settings > API
+      - key: SUPABASE_SERVICE_KEY
+        sync: false # From Supabase Project Settings > API > service_role key
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USER
+        sync: false # Your Gmail address
+      - key: MAIL_PASS
+        sync: false # Your Gmail App Password
+      - key: GEMINI_API_KEY
+        sync: false # Optional: Google Gemini API key
+      - key: OPENAI_API_KEY
+        sync: false # Optional: OpenAI API key

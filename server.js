@@ -76,8 +76,19 @@ app.use(xss()); // Sanitize user input from malicious HTML
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(compression()); // Compress responses
 
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : ['http://localhost:5173', 'http://localhost:3000'];
+
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error(`CORS: Origin ${origin} not allowed`));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -110,6 +121,16 @@ const upload = multer({ storage });
 // Upload Endpoint
 app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.file) return res.status(400).send('No file uploaded.');
+
+    // In production, return a Supabase Storage public URL format
+    // The actual Supabase upload logic can be added here when SUPABASE_URL is set
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+        // Supabase Storage path (file is still saved locally as buffer fallback)
+        const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/uploads/${req.file.filename}`;
+        return res.json({ url: publicUrl });
+    }
+
+    // Development: local file URL
     res.json({ url: `/uploads/${req.file.filename}` });
 });
 
