@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { X, Copy, CheckCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSettings } from '../context/SettingsContext';
@@ -29,36 +29,32 @@ const PaymentModal = ({ product, isOpen, onClose }) => {
         setLoading(true);
 
         const orderData = {
-            productId: product.id,
-            productName: product.name,
-            amount: product.price,
+            productId: product?.id,
+            productName: product?.name,
+            amount: product?.price,
             customerPhone: formData.phone,
             customerEmail: formData.email,
-            paymentMethod: method,
+            customerName: formData.name || '',
+            mfsProvider: method,
             transactionID: formData.trxID,
-            status: 'Pending'
         };
 
         try {
-            // Need to wrap in array because our generic endpoint expects array for bulk replace, 
-            // BUT wait, our generic endpoint DESTROYS data. We need a specific create endpoint for orders.
-            // Oh right, my generic handler was: destroy all -> create bulk. 
-            // THAT IS BAD FOR ORDERS. I NEED TO FIX SERVER TO ALLOW SINGLE INSERT OR USE A DIFFERENT ENDPOINT.
-            // Temporary fix: I will add a specific route in a moment. For now let's assume /api/new-order exists.
-
-            const res = await fetch('/api/new-order', {
+            const res = await fetch('/api/mfs/init', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)
             });
 
-            if (res.ok) {
+            const json = await res.json();
+
+            if (res.ok && json.success) {
                 setStep(3);
             } else {
-                toast.error('Order failed. Please try again.');
+                toast.error(json.error || 'Order failed. Please try again.');
             }
-        } catch (error) {
-            toast.error('Network error.');
+        } catch {
+            toast.error('Network error. Please check your connection.');
         } finally {
             setLoading(false);
         }

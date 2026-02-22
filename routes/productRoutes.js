@@ -10,7 +10,11 @@ import {
     createAttribute,
     updateAttribute,
     deleteAttribute,
-    getDashboardStats
+    getDashboardStats,
+    updateStock,
+    getReviews,
+    updateReviewStatus,
+    deleteReview
 } from '../controllers/productController.js';
 
 const router = express.Router();
@@ -19,6 +23,11 @@ router.get('/', getProducts);
 router.post('/', createProduct);
 router.post('/bulk', bulkAction);
 router.get('/dashboard/stats', getDashboardStats);
+router.put('/:id/stock', updateStock);
+
+router.get('/reviews', getReviews);
+router.put('/reviews/:id/status', updateReviewStatus);
+router.delete('/reviews/:id', deleteReview);
 router.get('/attributes', getAttributes);
 router.post('/attributes', createAttribute);
 router.put('/attributes/:id', updateAttribute);

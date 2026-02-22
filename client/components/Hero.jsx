@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-scroll';
 import { ArrowRight, Download, Github, Linkedin, Facebook, Youtube } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';

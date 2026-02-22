@@ -1,52 +1,47 @@
-
 import { Category, Product, sequelize } from '../models/index.js';
-import slugify from 'slugify';
+import slugify from '../utils/slugify.js';
+import catchAsync from '../utils/catchAsync.js';
 
-export const getCategories = async (req, res) => {
-    try {
-        const categories = await Category.findAll({
-            order: [['order', 'ASC'], ['id', 'ASC']],
-            include: [
-                { model: Category, as: 'children' },
-                { model: Category, as: 'parent' }
-            ]
-        });
+export const getCategories = catchAsync(async (req, res) => {
+    const categories = await Category.findAll({
+        order: [['order', 'ASC'], ['id', 'ASC']],
+        include: [
+            { model: Category, as: 'children' },
+            { model: Category, as: 'parent' }
+        ]
+    });
 
-        // Optional: Build tree structure on backend if requested
-        if (req.query.tree === 'true') {
-            const buildTree = (cats, parentId = null) => {
-                return cats
-                    .filter(cat => cat.parentId === parentId)
-                    .map(cat => ({
-                        ...cat.toJSON(),
-                        children: buildTree(cats, cat.id)
-                    }));
-            };
-            return res.json(buildTree(categories));
-        }
-
-        res.json(categories);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to fetch categories' });
+    if (req.query.tree === 'true') {
+        const buildTree = (cats, parentId = null) => {
+            return cats
+                .filter(cat => cat.parentId === parentId)
+                .map(cat => ({
+                    ...cat.toJSON(),
+                    children: buildTree(cats, cat.id)
+                }));
+        };
+        return res.json(buildTree(categories));
     }
-};
 
-export const createCategory = async (req, res) => {
+    res.json(categories);
+});
+
+export const createCategory = catchAsync(async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { name, parentId, description, icon, image, banner, seo_title, seo_desc } = req.body;
+        if (!name) {
+            await t.rollback();
+            return res.status(400).json({ error: 'Name is required' });
+        }
 
         let slug = req.body.slug || slugify(name, { lower: true, strict: true });
-
-        // Ensure unique slug
         let uniqueSlug = slug;
         let counter = 1;
         while (await Category.findOne({ where: { slug: uniqueSlug }, transaction: t })) {
             uniqueSlug = `${slug}-${counter++}`;
         }
 
-        // Get max order for new item
         const maxOrder = await Category.max('order', { where: { parentId: parentId || null }, transaction: t });
 
         const category = await Category.create({
@@ -66,12 +61,11 @@ export const createCategory = async (req, res) => {
         res.status(201).json(category);
     } catch (error) {
         await t.rollback();
-        console.error(error);
-        res.status(500).json({ error: 'Failed to create category' });
+        throw error;
     }
-};
+});
 
-export const updateCategory = async (req, res) => {
+export const updateCategory = catchAsync(async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;
@@ -83,13 +77,11 @@ export const updateCategory = async (req, res) => {
             return res.status(404).json({ error: 'Category not found' });
         }
 
-        // Prevent circular dependency
         if (parentId && parentId == id) {
             await t.rollback();
             return res.status(400).json({ error: 'Category cannot be its own parent' });
         }
 
-        // Update fields
         if (name) category.name = name;
         if (description !== undefined) category.description = description;
         if (icon !== undefined) category.icon = icon;
@@ -111,15 +103,13 @@ export const updateCategory = async (req, res) => {
         await category.save({ transaction: t });
         await t.commit();
         res.json(category);
-
     } catch (error) {
         await t.rollback();
-        console.error(error);
-        res.status(500).json({ error: 'Failed to update category' });
+        throw error;
     }
-};
+});
 
-export const deleteCategory = async (req, res) => {
+export const deleteCategory = catchAsync(async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;
@@ -130,31 +120,30 @@ export const deleteCategory = async (req, res) => {
             return res.status(404).json({ error: 'Category not found' });
         }
 
-        // Move children to parent or root? Or delete? 
-        // Strategy: Link children to deleted category's parent (preserve hierarchy)
         if (category.children && category.children.length > 0) {
             await Category.update(
                 { parentId: category.parentId },
                 { where: { parentId: id }, transaction: t }
             );
         }
-        // Or if you want to prevent delete:
-        // if (category.children.length > 0) return res.status(400).json({error: 'Has children'});
 
         await category.destroy({ transaction: t });
         await t.commit();
         res.json({ message: 'Category deleted' });
     } catch (error) {
         await t.rollback();
-        console.error(error);
-        res.status(500).json({ error: 'Failed to delete category' });
+        throw error;
     }
-};
+});
 
-export const updateCategoryOrder = async (req, res) => {
+export const updateCategoryOrder = catchAsync(async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { items } = req.body; // Expecting array of { id, order, parentId }
+        const { items } = req.body;
+        if (!items || !Array.isArray(items)) {
+            await t.rollback();
+            return res.status(400).json({ error: 'Items array is required' });
+        }
 
         for (const item of items) {
             await Category.update(
@@ -167,7 +156,6 @@ export const updateCategoryOrder = async (req, res) => {
         res.json({ message: 'Order updated' });
     } catch (error) {
         await t.rollback();
-        console.error(error);
-        res.status(500).json({ error: 'Failed to update order' });
+        throw error;
     }
-};
+});

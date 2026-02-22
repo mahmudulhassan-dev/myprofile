@@ -142,6 +142,7 @@ const Navbar = () => {
                                 return renderLink(item);
                             })}
                             <a href="/client-portal" className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-all px-4 py-2 rounded-xl hover:bg-slate-50">Portal</a>
+                            <a href="/services" className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-all px-4 py-2 rounded-xl hover:bg-slate-50">Services</a>
                         </div>
 
                         <div className="flex items-center gap-3">

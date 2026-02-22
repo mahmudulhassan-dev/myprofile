@@ -10,7 +10,7 @@ import {
     restoreBackup,
     deleteBackup
 } from '../controllers/settingsController.js';
-import { authenticate } from '../middlewares/authMiddleware.js';
+import { protect, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

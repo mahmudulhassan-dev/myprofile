@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import {
     LayoutDashboard, ShoppingBag, FileText, Settings, Image as ImageIcon,
     Users, LogOut, Menu, X, ChevronRight, Bell, Search, Globe, Shield,
     Palette, Share2, Mail, MapPin, Database, Code, BookOpen, MessageSquare, Star,
     DollarSign, HelpCircle, UserCheck, Folder, Briefcase, MessageCircle, Activity,
-    Layout, Columns, BarChart2, Layers, Tag, Box, Package, TrendingUp
+    Layout, Columns, BarChart2, Layers, Tag, Box, Package, TrendingUp, Zap, Smartphone
 } from 'lucide-react';
 
-const SidebarItem = ({ icon: Icon, label, active, onClick, badge }) => (
+const SidebarItem = ({ icon: IconComponent, label, active, onClick, badge }) => (
     <button
         onClick={onClick}
         className={`w-full flex items-center justify-between p-3 rounded-lg mb-1 transition-all duration-200 group ${active
@@ -17,7 +17,7 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, badge }) => (
             }`}
     >
         <div className="flex items-center gap-3">
-            <Icon size={20} className={`${active ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+            <IconComponent size={20} className={`${active ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
             <span className="font-medium text-sm">{label}</span>
         </div>
         {badge && (
@@ -74,6 +74,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
                     <SidebarItem icon={MessageSquare} label="Reviews" active={activeTab === 'mh-reviews'} onClick={() => setActiveTab('mh-reviews')} />
                     <SidebarItem icon={TrendingUp} label="Analytics" active={activeTab === 'mh-analytics'} onClick={() => setActiveTab('mh-analytics')} />
                     <SidebarItem icon={Settings} label="Settings" active={activeTab === 'mh-settings'} onClick={() => setActiveTab('mh-settings')} />
+                    <SidebarItem icon={Smartphone} label="MFS Orders" active={activeTab === 'mh-mfs-orders'} onClick={() => setActiveTab('mh-mfs-orders')} badge="Pay" />
                 </div>
 
                 <p className="text-slate-500 text-xs font-bold uppercase mt-6 mb-3 tracking-wider">Content</p>
@@ -92,7 +93,11 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
                 <SidebarItem icon={Search} label="SEO & Metadata" active={activeTab === 'seo'} onClick={() => setActiveTab('seo')} />
                 <SidebarItem icon={MessageCircle} label="Live Chat" active={activeTab === 'livechat'} onClick={() => setActiveTab('livechat')} />
 
+                <p className="text-slate-500 text-xs font-bold uppercase mt-6 mb-3 tracking-wider">Monitoring</p>
+                <SidebarItem icon={Activity} label="System Cluster" active={activeTab === 'system-cluster'} onClick={() => setActiveTab('system-cluster')} badge="Pro" />
+
                 <p className="text-slate-500 text-xs font-bold uppercase mt-6 mb-3 tracking-wider">Configuration</p>
+                <SidebarItem icon={Zap} label="Automation Hub" active={activeTab === 'automation'} onClick={() => setActiveTab('automation')} badge="New" />
                 <SidebarItem icon={Settings} label={t('admin_settings')} active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
                 <SidebarItem icon={Palette} label={t('admin_appearance')} active={activeTab === 'appearance'} onClick={() => setActiveTab('appearance')} badge="Pro" />
             </div>

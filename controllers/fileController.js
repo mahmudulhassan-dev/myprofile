@@ -80,15 +80,9 @@ export const createFolder = async (req, res) => {
             path: path.join(parent.path || '', name)
         });
 
-        // 2. Create on Disk (Optional structure, usually allow flat uploads or mimicking tree)
-        // Let's mimic tree for organization
-        /* 
-           NOTE: syncing disk paths with DB IDs is complex if we rename. 
-           For robustness, we might keep flat /uploads/ structure 
-           OR separate logic. Let's try matching names for now.
-        */
-        // const fullPath = path.join(UPLOAD_ROOT, newFolder.path || '');
-        // if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
+        // 2. Create on Disk
+        const fullPath = path.join(UPLOAD_ROOT, newFolder.path || '');
+        if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
 
         res.json({ success: true, folder: newFolder });
     } catch (error) {
@@ -140,7 +134,10 @@ export const deleteItems = async (req, res) => {
                 const file = await File.findByPk(item.id);
                 if (file) {
                     // Try delete from disk
-                    // fs.unlink...
+                    const fullPath = path.resolve(file.path);
+                    if (fs.existsSync(fullPath)) {
+                        fs.unlinkSync(fullPath);
+                    }
                     await file.destroy();
                 }
             }
@@ -199,9 +196,26 @@ export const operateItems = async (req, res) => {
             if (items.length === 1) {
                 const item = items[0];
                 if (item.isDirectory) {
-                    await Folder.update({ name: newName }, { where: { id: item.id } });
+                    const folder = await Folder.findByPk(item.id);
+                    if (folder) {
+                        const oldPath = path.join(UPLOAD_ROOT, folder.path);
+                        const newPath = path.join(UPLOAD_ROOT, path.dirname(folder.path), newName);
+                        if (fs.existsSync(oldPath)) fs.renameSync(oldPath, newPath);
+                        folder.name = newName;
+                        folder.path = path.join(path.dirname(folder.path), newName);
+                        await folder.save();
+                    }
                 } else {
-                    await File.update({ name: newName }, { where: { id: item.id } });
+                    const file = await File.findByPk(item.id);
+                    if (file) {
+                        const oldPath = path.resolve(file.path);
+                        const newPath = path.join(path.dirname(oldPath), newName);
+                        if (fs.existsSync(oldPath)) fs.renameSync(oldPath, newPath);
+                        file.name = newName;
+                        file.path = newPath;
+                        file.url = file.url.replace(path.basename(file.url), newName);
+                        await file.save();
+                    }
                 }
                 res.json({ success: true, message: 'Item renamed successfully' });
             } else {

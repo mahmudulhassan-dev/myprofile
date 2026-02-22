@@ -1,6 +1,8 @@
 import SSLCommerzPayment from 'sslcommerz-lts';
 import { Order, Product } from '../models/index.js';
 import { v4 as uuidv4 } from 'uuid';
+import { triggerAutomation } from '../utils/automation.js';
+import process from 'process';
 
 const STORE_ID = process.env.STORE_ID || 'testbox';
 const STORE_PASSWORD = process.env.STORE_PASSWORD || 'qwerty';
@@ -94,6 +96,16 @@ export const paymentSuccess = async (req, res) => {
                 val_id: req.body.val_id,
                 paymentMethod: req.body.card_type || 'sslcommerz'
             });
+
+            // Trigger Automation
+            triggerAutomation('new_order', {
+                orderId: order.id,
+                tran_id,
+                amount: order.amount,
+                customer: order.customerEmail,
+                product: order.productName
+            });
+
             // Redirect to frontend success page
             res.redirect(`http://localhost:5173/payment/success?tran_id=${tran_id}`);
         } else {
@@ -114,9 +126,128 @@ export const paymentFail = async (req, res) => {
     res.redirect('http://localhost:5173/payment/fail');
 };
 
-export const paymentCancel = async (req, res) => {
+export const paymentCancel = async (req) => {
     const { tran_id } = req.params;
     const order = await Order.findOne({ where: { transactionID: tran_id } });
     if (order) await order.update({ payment_status: 'Cancelled', status: 'Cancelled' });
-    res.redirect('http://localhost:5173/payment/fail'); // Or cancel page
+};
+
+// --- Phase 7: MFS Integration (bKash / Nagad / Rocket) ---
+
+/**
+ * POST /api/mfs/init
+ * Public — customer submits payment intent after sending money manually.
+ * Creates an Order record with Pending status for admin verification.
+ */
+export const initMfsPayment = async (req, res) => {
+    try {
+        const {
+            productId, productName, amount,
+            customerName, customerEmail, customerPhone,
+            mfsProvider, transactionID
+        } = req.body;
+
+        // Validate required MFS fields
+        if (!mfsProvider || !transactionID || !customerPhone) {
+            return res.status(400).json({ error: 'mfsProvider, transactionID, and customerPhone are required.' });
+        }
+
+        const allowedProviders = ['bkash', 'nagad', 'rocket'];
+        if (!allowedProviders.includes(mfsProvider.toLowerCase())) {
+            return res.status(400).json({ error: `Invalid mfsProvider. Must be one of: ${allowedProviders.join(', ')}` });
+        }
+
+        // Check for duplicate TrxID to prevent double-submission
+        const existing = await Order.findOne({ where: { transactionID } });
+        if (existing) {
+            return res.status(409).json({ error: 'This Transaction ID has already been submitted.' });
+        }
+
+        const order = await Order.create({
+            productId: productId || null,
+            productName: productName || 'Manual Order',
+            amount: String(amount || '0'),
+            customerName: customerName || '',
+            customerEmail: customerEmail || '',
+            customerPhone,
+            address: '',
+            paymentMethod: mfsProvider.toLowerCase(),
+            transactionID,
+            mfsProvider: mfsProvider.toLowerCase(),
+            status: 'Pending',
+            payment_status: 'Unpaid'
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: 'Payment submitted. We will verify and confirm your order shortly.',
+            orderId: order.id
+        });
+    } catch (error) {
+        console.error('[MFS Init Error]', error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+/**
+ * GET /api/mfs/orders
+ * Admin-only — fetch all MFS pending orders, newest first.
+ */
+export const getMfsOrders = async (req, res) => {
+    try {
+        const { status } = req.query;
+        const where = { paymentMethod: ['bkash', 'nagad', 'rocket'] };
+        if (status) where.payment_status = status;
+
+        const orders = await Order.findAll({
+            where,
+            order: [['createdAt', 'DESC']]
+        });
+
+        return res.json({ success: true, count: orders.length, orders });
+    } catch (error) {
+        console.error('[MFS Orders Error]', error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+/**
+ * PATCH /api/mfs/orders/:id
+ * Admin-only — approve or reject an MFS order.
+ * Body: { action: 'approve' | 'reject', note: '...' }
+ */
+export const updateMfsOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action } = req.body;
+
+        if (!['approve', 'reject'].includes(action)) {
+            return res.status(400).json({ error: "action must be 'approve' or 'reject'" });
+        }
+
+        const order = await Order.findByPk(id);
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        const update = action === 'approve'
+            ? { payment_status: 'Paid', status: 'Processing' }
+            : { payment_status: 'Rejected', status: 'Cancelled' };
+
+        await order.update(update);
+
+        // Fire automation hook on approval
+        if (action === 'approve') {
+            triggerAutomation('new_order', {
+                orderId: order.id,
+                tran_id: order.transactionID,
+                amount: order.amount,
+                customer: order.customerEmail,
+                product: order.productName
+            });
+        }
+
+        return res.json({ success: true, message: `Order ${action}d successfully.`, order });
+    } catch (error) {
+        console.error('[MFS Update Error]', error);
+        return res.status(500).json({ error: error.message });
+    }
 };

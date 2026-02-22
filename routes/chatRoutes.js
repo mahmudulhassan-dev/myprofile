@@ -1,6 +1,6 @@
 import express from 'express';
 import { startSession, getHistory, getSessions, getSession, createDoc, getDocs } from '../controllers/chatController.js';
-import { protect, authorize } from '../controllers/authController.js'; // Assuming auth exists
+import { protect, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

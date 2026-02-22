@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { Loader2, Bell, Search, ExternalLink } from 'lucide-react';
+import { Bell, Search, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminSidebar from './admin/AdminSidebar';
 import SettingsPanel from './admin/SettingsPanel';
@@ -10,6 +10,7 @@ import FileManager from './admin/FileManager';
 import MediaManager from './admin/MediaManager';
 import OrdersManager from './admin/OrdersManager';
 import PricingManager from './admin/PricingManager';
+import AutomationHub from './admin/AutomationHub';
 
 import ServicesManager from './admin/ServicesManager';
 import SkillsManager from './admin/SkillsManager';
@@ -37,6 +38,7 @@ import StockManager from './admin/commerce/StockManager';
 import ReviewManager from './admin/commerce/ReviewManager';
 import ProductAnalytics from './admin/commerce/ProductAnalytics';
 import MHSettings from './admin/commerce/MHSettings';
+import MfsOrderManager from './admin/commerce/MfsOrderManager';
 
 
 // Placeholder for other sections to keep file clean
@@ -48,11 +50,10 @@ const TabPlaceholder = ({ title }) => (
 );
 
 const AdminDashboard = () => {
-    const { t } = useLanguage();
+    useLanguage();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [loading, setLoading] = useState(false);
 
     // Simple password protection 
     const handleLogin = (e) => {
@@ -127,9 +128,10 @@ const AdminDashboard = () => {
 
                 {/* Content Body */}
                 <main className="p-8 flex-1 overflow-y-auto">
-                    {activeTab === 'dashboard' && <AdvancedDashboard />}
+                    {(activeTab === 'dashboard' || activeTab === 'system-cluster') && <AdvancedDashboard />}
                     {activeTab === 'settings' && <SettingsPanel />}
                     {activeTab === 'appearance' && <AppearancePanel />}
+                    {activeTab === 'automation' && <AutomationHub />}
                     {activeTab === 'header' && <HeaderManager />}
                     {activeTab === 'footer' && <FooterManager />}
 
@@ -158,6 +160,7 @@ const AdminDashboard = () => {
                     {activeTab === 'mh-reviews' && <ReviewManager />}
                     {activeTab === 'mh-analytics' && <ProductAnalytics />}
                     {activeTab === 'mh-settings' && <MHSettings />}
+                    {activeTab === 'mh-mfs-orders' && <MfsOrderManager />}
 
                     {/* Users & Marketing */}
                     {activeTab === 'users' && <UsersManager />}
