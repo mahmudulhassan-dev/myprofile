@@ -224,3 +224,23 @@ export const updateStock = catchAsync(async (req, res) => {
     res.json({ success: true, message: 'Stock updated', product });
 });
 
+// --- Reviews ---
+
+export const getReviews = catchAsync(async (req, res) => {
+    // Placeholder: Reviews can be stored in ProductMeta or a separate Review model
+    // For now, return empty array until a Review model is created
+    res.json({ reviews: [], total: 0 });
+});
+
+export const updateReviewStatus = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    // Placeholder until Review model is created
+    res.json({ success: true, message: `Review ${id} status updated to ${status}` });
+});
+
+export const deleteReview = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    // Placeholder until Review model is created
+    res.json({ success: true, message: `Review ${id} deleted` });
+});
