@@ -14,10 +14,10 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            'vendor-ui': ['framer-motion', 'lucide-react', 'recharts'],
-            'vendor-utils': ['axios', 'i18next', 'react-i18next']
+          manualChunks(id) {
+            if (id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor-react'
+            if (id.includes('framer-motion') || id.includes('lucide-react') || id.includes('recharts')) return 'vendor-ui'
+            if (id.includes('axios') || id.includes('i18next')) return 'vendor-utils'
           }
         }
       },
